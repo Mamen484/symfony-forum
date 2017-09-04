@@ -59,7 +59,7 @@ class Post
     private $answers;
 
     /**
-     * @ORM/Column(name="slug, type="string, length=255, unique=true)
+     * @ORM\Column(name="slug", type="string", length=255, unique=true)
      * @Gedmo\Slug(fields={"author", "title"})
      * @var string
      */

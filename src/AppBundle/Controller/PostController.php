@@ -40,7 +40,7 @@ class PostController extends Controller
     }
 
     /**
-     * $Route("post-par-annee/{year}", name="post_by_year")
+     * @Route("post-par-annee/{year}", name="post_by_year",
      *      requirements={"year":"\d{4}"})
      * @param $year
      * @return Response
