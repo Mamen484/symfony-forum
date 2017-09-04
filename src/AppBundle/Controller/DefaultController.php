@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Post;
+use AppBundle\Form\PostType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +25,16 @@ class DefaultController extends Controller
         $list = $repository->getAllThemes()->getArrayResult();
         $postListByYear = $postRepository->getPostsGroupedByYear();
 
+        //Création du formulaire
+        $post = new Post();
+        $form = $this->createForm(PostType::class, $post);
+
         return $this->render('default/index.html.twig',
-            ["themeList" => $list, "postList"=>$postListByYear]);
+            [
+                "themeList" => $list,
+                "postList" => $postListByYear,
+                "postForm" => $form->createView()
+            ]);
     }
 
     /**
@@ -32,7 +42,8 @@ class DefaultController extends Controller
      * @param $id
      * @return Response
      */
-    public function themeAction($id){
+    public function themeAction($id)
+    {
 
         $repository = $this->getDoctrine()
             ->getRepository("AppBundle:Theme");
@@ -41,7 +52,7 @@ class DefaultController extends Controller
 
         $allThemes = $repository->getAllThemes()->getArrayResult();
 
-        if(! $theme){
+        if (!$theme) {
             throw new NotFoundHttpException("Thème introuvable");
         }
 

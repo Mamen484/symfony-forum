@@ -1,0 +1,21 @@
+{
+  "name": "symfony-forum",
+  "homepage": "https://github.com/smaloron/symfony-forum",
+  "authors": [
+    "Mamen484 <30903165+Mamen484@users.noreply.github.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "web/bower-components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}
