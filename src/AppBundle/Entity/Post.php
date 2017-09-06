@@ -40,9 +40,9 @@ class Post
     private $text;
 
     /**
-     * @var string
+     * @var Author
      *
-     * @ORM\Column(name="author", type="string", length=50)
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Author", inversedBy="posts")
      */
     private $author;
 
@@ -60,10 +60,19 @@ class Post
 
     /**
      * @ORM\Column(name="slug", type="string", length=255, unique=true)
-     * @Gedmo\Slug(fields={"author", "title"})
+     * @Gedmo\Slug(fields={"title"})
      * @var string
      */
     private $slug;
+
+    /**
+     * @return string
+     */
+    public function getAuthorFullName()
+    {
+
+        return $this->author->getFirstName() . " " . $this->author->getName();
+    }
 
     /**
      * @return string
@@ -84,7 +93,7 @@ class Post
     }
 
     /**
-     * @return string
+     * @return Author
      */
     public function getAuthor()
     {
@@ -92,7 +101,7 @@ class Post
     }
 
     /**
-     * @param string $author
+     * @param Author $author
      * @return Post
      */
     public function setAuthor($author)
@@ -109,8 +118,6 @@ class Post
      * @ORM\Column(name="createdAt", type="datetime")
      */
     private $createdAt;
-
-
 
 
     /**
@@ -194,6 +201,7 @@ class Post
     {
         return $this->title;
     }
+
     /**
      * Constructor
      */
