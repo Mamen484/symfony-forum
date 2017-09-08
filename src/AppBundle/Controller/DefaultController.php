@@ -29,7 +29,7 @@ class DefaultController extends Controller
 
         //Gestion des nouveaux post
         $user = $this->getUser();
-        $roles = isset($user)?$user->getRoles():[];
+        $roles = isset($user) ? $user->getRoles() : [];
         $formView = null;
 
         if (in_array("ROLE_AUTHOR", $roles)) {
@@ -37,22 +37,21 @@ class DefaultController extends Controller
             $post = new Post();
             $post->setCreatedAt(new \DateTime());
             $post->setAuthor($user);
-            $form = $this->createForm(PostType::class, $post);
 
-            //Hydratation de l'entité post
-            $form->handleRequest($request);
-
+            $formHandler = $this->get("post.form_handler")
+                ->setPost($post);
+            
             //Traitement du formulaire
-            if ($form->isSubmitted() and $form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($post);
-                $em->flush();
+            if ($formHandler->process()) {
+
+                // $uploadManager = $this->get("stof_doctrine_extensions.uploadable.manager");
+                // $uploadManager->markEntityToUpload($post, $post->getImageFileName());
 
                 //Redirection
                 return $this->redirectToRoute("homepage");
             }
 
-            $formView = $form->createView();
+            $formView = $formHandler->getFormView();
         }
         //Fin des la gestion des nouveaus posts
 
@@ -139,7 +138,26 @@ class DefaultController extends Controller
         return $this->render(":default:generic-login.html.twig",
             [
                 "title" => "Indentification des auteurs",
-                "action" => $this->generateUrl("author_login_check")
+                "action" => $this->generateUrl("author_login_check"),
+                "userName" => $securityUtils->getLastUsername(),
+                "error" => $securityUtils->getLastAuthenticationError()
             ]);
+    }
+
+    /**
+     * @Route("/test-service")
+     * @return Response
+     */
+    public function testServiceAction()
+    {
+
+        $helloService = $this->get("service.hello");
+        $helloService->setName("Madame");
+
+        $newHelloService = $this->get("service.hello");
+
+        $message = $helloService->sayHello() . ' ' . $newHelloService->sayHello();
+
+        return $this->render("default/test-service.html.twig", ["message" => $message]);
     }
 }

@@ -4,12 +4,15 @@ namespace AppBundle\Controller;
 
 
 use AppBundle\AppBundle;
+use AppBundle\Entity\Post;
+use AppBundle\Form\PostType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Gedmo\Mapping\Annotation\Slug;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class PostController extends Controller
 {
@@ -56,4 +59,36 @@ class PostController extends Controller
         ]);
     }
 
+    /**
+     * @Route("/post/modif/{id}", name="post_edit")
+     * @param Request $request
+     * @param Post $post
+     * @return Response
+     */
+    public function editAction(Request $request, Post $post)
+    {
+
+        $user = $this->getUser();
+        $roles = isset($user) ? $user->getRoles() : [];
+        $userId = isset($user) ? $user->getId() : null;
+        if (!in_array("ROLE_AUTHOR", $roles) || $userId != $post->getAuthor()->getId()) {
+            throw new AccessDeniedException("Vous n'avez pas les droits pour modifier ce post");
+        }
+
+        //Création du formulaire
+        $form = $this->createForm(PostType::class, $post);
+
+        //Hydratation de l'entité avec la requete
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()){
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($post);
+            $em->flush();
+
+            return $this->redirectToRoute("theme_details", ["id" => $post->getTheme()->getId()]);
+        }
+
+        return $this->render("post/edit.html.twig", ["postForm"=>$form->createView()]);
+    }
 }
